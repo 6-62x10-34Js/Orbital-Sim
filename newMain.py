@@ -17,6 +17,9 @@ peri_arg = 0  # argument of periapsis (see link) in degrees
 period = 168  # orbital period in days
 
 
+frames = 10000 # number of frames in the animation
+time_res = 1 # stepsize
+
 def calc_satellite_pos(t):
     # Convert time to radians
     M = 2 * np.pi * t / period
@@ -102,7 +105,7 @@ def update(frame):
     positions = []
     velocities = []
     # Calculate the position of the satellite at the current time
-    t = frame * 5
+    t = frame * time_res
     x, y, z, v_mag, r = calc_satellite_pos(t)
 
     xdata.append(t)
@@ -153,10 +156,10 @@ def update(frame):
     ax.plot_surface(X, Y, Z, alpha=0.5)
 
 # Create the animation using the FuncAnimation function
-anim = FuncAnimation(fig, update, init_func=init, frames=100, interval=20)
+anim = FuncAnimation(fig, update, init_func=init, frames=frames, interval=20)
 # Display the animation
 plt.show()
 # Exchange with the location of your desire
 f = r"c://Users/Georg/Documents/Uni/Space Sciences MA/Measurement Methods in Space Physics/animate_func.gif"
-writergif = animation.PillowWriter(fps=30 / 6)
+writergif = animation.PillowWriter(fps=300 / 6)
 anim.save(f, writer=writergif)
