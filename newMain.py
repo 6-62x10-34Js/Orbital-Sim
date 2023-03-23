@@ -8,7 +8,7 @@ from matplotlib.animation import FuncAnimation
 # Orbital parameters of the satellite
 AU = 149597870700 #meters in 1 AU
 my_0 = 1.327E20 #heliocentric gravitational constant m^3/s^-2
-my = AU / my_0
+my = my_0 / AU
 a = 0.5959  # semimajor axis in AU
 e = 0.5301  # eccentricity
 inc = 33  # inclination in degrees
@@ -17,7 +17,7 @@ peri_arg = 0  # argument of periapsis (see link) in degrees
 period = 168  # orbital period in days
 
 
-frames = 10000 # number of frames in the animation
+frames = period * 2 # number of frames in the animation
 time_res = 1 # stepsize
 
 def calc_satellite_pos(t):
@@ -59,8 +59,8 @@ def calc_satellite_pos(t):
     z = y_orb * np.sin(np.radians(inc))
 
     # Velocity try 3
-    v = np.sqrt(my * (2/r*AU - 1/a*AU)) # in AU / s
-    v_mag = v
+    v = np.sqrt(my * ((2/r) - (1/a))) # in m / s
+    v_mag = v / 1000 # in km / s
 
     # Calculate the velocity of the satellite in Cartesian coordinates
     n = 2 * np.pi / (period * 24 * 60 * 60)
@@ -128,14 +128,13 @@ def update(frame):
     ax.set_zlim3d(-1, 1)
     ax.scatter(0, 0, 0, color='yellow', s=200, label='Sun')
     ax.scatter(x, y, z, color='blue', s=10, label='Satellite')
-    ax.axvline(x=0,ymax=1, ymin=-1, color='black')
 
     ax.legend()
     # ax.view_init(30, t * 360 / period)
 
     # Update the velocity subplot
     ax2.set_xlim(t-t, 5 + t)
-    ax2.set_ylim(5, 50)
+    ax2.set_ylim(5, 80)
     print(v_mag)
     ax2.set_xlabel('Time')
     ax2.set_ylabel('Velocity')
