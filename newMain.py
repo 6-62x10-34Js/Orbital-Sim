@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+# For PyCharm users; use TkAgg
+#import matplotlib; matplotlib.use("TkAgg")
 import numpy as np
 from matplotlib import animation
 from matplotlib.animation import FuncAnimation
@@ -125,6 +127,10 @@ def update(frame):
     ax3.set_ylabel('Radius')
     line2.set_data(xdata, ydata2)
 
+    # Define the XY plane
+    X, Y = np.meshgrid(np.arange(-1, 1, 0.1), np.arange(-1, 1, 0.1))
+    Z = np.zeros(X.shape)
+    ax.plot_surface(X, Y, Z, alpha=0.5)
 
 # Create the animation using the FuncAnimation function
 anim = FuncAnimation(fig, update, init_func=init, frames=100, interval=20)
