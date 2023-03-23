@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 # For PyCharm users; use TkAgg
-#import matplotlib; matplotlib.use("TkAgg")
+import matplotlib; matplotlib.use("TkAgg")
 import numpy as np
 from matplotlib import animation
 from matplotlib.animation import FuncAnimation
@@ -62,10 +62,9 @@ ax.set_xlim3d(-1, 1)
 ax.set_ylim3d(-1, 1)
 ax.set_zlim3d(-1, 1)
 ax.scatter(0, 0, 0, color='yellow', s=200)
+
 legend = plt.legend(loc=2, prop={'size': 6})
 
-
-# TODO: draw a opaque plane in x,y to indicate the Suns equatorial plane
 def init():
     line.set_data([], [])
     return line,
@@ -88,6 +87,7 @@ def update(frame):
     # Calculate the position of the satellite at the current time
     t = frame * 5
     x, y, z, v_mag, r = calc_satellite_pos(t)
+
     xdata.append(t)
     ydata.append(v_mag)
     ydata2.append(r)
@@ -108,6 +108,8 @@ def update(frame):
     ax.set_zlim3d(-1, 1)
     ax.scatter(0, 0, 0, color='yellow', s=200, label='Sun')
     ax.scatter(x, y, z, color='blue', s=10, label='Satellite')
+    ax.axvline(x=0,ymax=1, ymin=-1, color='black')
+
     ax.legend()
     # ax.view_init(30, t * 360 / period)
 
@@ -126,6 +128,7 @@ def update(frame):
     ax3.set_xlabel('Time')
     ax3.set_ylabel('Radius')
     line2.set_data(xdata, ydata2)
+
 
     # Define the XY plane
     X, Y = np.meshgrid(np.arange(-1, 1, 0.1), np.arange(-1, 1, 0.1))
