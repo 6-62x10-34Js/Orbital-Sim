@@ -4,7 +4,7 @@ from matplotlib import animation
 from matplotlib.animation import FuncAnimation
 
 # Orbital parameters of the satellite
-a = 0.56  # semimajor axis in AU
+a = 0.5959  # semimajor axis in AU
 e = 0.5301  # eccentricity
 inc = 33  # inclination in degrees
 peri_arg = 0  # argument of periapsis (see link) in degrees
@@ -47,20 +47,33 @@ def calc_satellite_pos(t):
     vx = -r * n * np.sin(v)
     vy = r * n * (e + np.cos(v)) * np.cos(inc) / np.sqrt(1 - e ** 2)
     vz = r * n * (e + np.cos(v)) * np.sin(inc) / np.sqrt(1 - e ** 2)
+    # print('x:'+ str(vx) +'y:' + str(vy) + 'z:'+ str(vz))
+    v_mag = r * np.sqrt(vx ** 2 + vy ** 2 + vz ** 2)
 
-    return x, y, z, vx, vy, vz
+    return x, y, z, v_mag
 
 
 # Create a 3D plot and add the Sun as a fixed point at the origin
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
+fig = plt.figure(figsize=(12, 6))
+ax = fig.add_subplot(1, 2, 1, projection='3d')
 ax.set_xlim3d(-1, 1)
 ax.set_ylim3d(-1, 1)
 ax.set_zlim3d(-1, 1)
 ax.scatter(0, 0, 0, color='yellow', s=200)
+legend = plt.legend(loc=2, prop={'size': 6})
 
 
 # TODO: draw a opaque plane in x,y to indicate the Suns equatorial plane
+def init():
+    line.set_data([], [])
+    return line,
+
+
+# Create the velocity subplot
+ax2 = fig.add_subplot(1, 2, 2)
+line, = ax2.plot([], [], 'ro')
+xdata, ydata = [], []
+
 
 # Define the update function that will be called for each frame
 def update(frame):
@@ -68,30 +81,41 @@ def update(frame):
     velocities = []
     # Calculate the position of the satellite at the current time
     t = frame * 5
-    x, y, z, vx, vy, vz = calc_satellite_pos(t)
-
+    x, y, z, v_mag = calc_satellite_pos(t)
+    xdata.append(t)
+    ydata.append(v_mag)
     # Should record the array of positions to animate the tail of the satellite
     # TODO: does not work
     positions.append((x, y, z))
-    velocities.append((vx, vy, vz))
+    velocities.append(v_mag)
 
-    if len(positions) > 1:
-        xs, ys, zs = zip(*positions)
-        ax.plot(xs, ys, zs, color='gray')
+    vel = 'velocity = ' + str(round(v_mag, 2))
+    # if len(positions) > 1:
+    #     xs, ys, zs = zip(*positions)
+    #     ax.plot(xs, ys, zs, color='gray')
 
     # Clear the previous frame and update the plot with the new position of the satellite
     ax.clear()
     ax.set_xlim3d(-1, 1)
     ax.set_ylim3d(-1, 1)
     ax.set_zlim3d(-1, 1)
-    ax.scatter(0, 0, 0, color='yellow', s=200)
-    ax.scatter(x, y, z, color='blue', s=10)
+    ax.scatter(0, 0, 0, color='yellow', s=200, label='Sun')
+    ax.scatter(x, y, z, color='blue', s=10, label='Satellite')
+    ax.legend()
     # ax.view_init(30, t * 360 / period)
+    # Update the velocity subplot
+
+    ax2.set_xlim(t-t, 5 + t)
+    ax2.set_ylim(0, 1E-6)
+    print(v_mag)
+    ax2.set_xlabel('Time')
+    ax2.set_ylabel('Velocity')
+    line.set_data(xdata, ydata)
 
 
 # Create the animation using the FuncAnimation function
-anim = FuncAnimation(fig, update, frames=range(period // 5), interval=10)
-
+anim = FuncAnimation(fig, update, init_func=init, frames=100, interval=20)
+fig.tight_layout()
 # Display the animation
 plt.show()
 # Exchange with the location of your desire
